@@ -1,0 +1,40 @@
+%YAML 1.1
+---
+version: https://codecheck.org.uk/spec/config/1.0
+
+paper:
+  title: >
+    Consciousness and Emotions in Non-Human Animals: Are Laypeople More or Less Skeptical than Experts?
+  authors:
+    - name: Bastian Jaeger
+      ORCID: 0000-0002-4398-9731
+    - name: Stefan Leach
+    - name: Matthew Zipple
+  reference: https://doi.org/10.71240/lcyc.238674
+
+manifest:
+  - file: codecheck/outputs/table_S1_model3a.txt
+    comment: Table S1 (consciousness attributions, multilevel logistic regression) - output of summary(model3a)
+  - file: codecheck/outputs/table_S2_model3b.txt
+    comment: Table S2 (emotion attributions, multilevel logistic regression) - output of summary(model3b)
+  - file: codecheck/outputs/table_S3_model4a.txt
+    comment: Table S3 (confidence in consciousness beliefs, multilevel linear regression) - output of summary(model4a)
+  - file: codecheck/outputs/table_S4_model4b.txt
+    comment: Table S4 (confidence in emotion beliefs, multilevel linear regression) - output of summary(model4b)
+
+codechecker:
+  - name: Karla Lozano Gonzalez
+    ORCID: 0000-0003-0329-4668
+
+# Shown in the certificate's summary table and in the Zenodo description.
+# LaTeX math between $ signs is kept, so write \$ for a dollar sign.
+summary: >
+  Tables S1-S4 of the supplemental materials (multilevel regression models
+  model3a, model3b, model4a, model4b) were successfully reproduced from
+  analysis code.R and the provided data.
+repository: osf::9v3rh
+check_time: "2026-10-26 10:00:00"
+certificate: 2026-032
+# Use the version-specific Zenodo DOI, not the "concept DOI" (which always
+# points at the latest version) - see https://zenodo.org/help/versioning
+report: https://doi.org/10.5281/zenodo.23670626

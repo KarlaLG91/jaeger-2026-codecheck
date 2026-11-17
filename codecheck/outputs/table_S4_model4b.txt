@@ -1,0 +1,41 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: emotion_confidence ~ gender + age + conservative + education +  
+    religious + vegn + pet + (1 | animal) + (1 | id)
+   Data: filter(data_long, sample == "Laypeople")
+
+REML criterion at convergence: 11598.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.6108 -0.6185  0.0821  0.6008  3.2646 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 0.5531   0.7437  
+ animal   (Intercept) 0.1433   0.3785  
+ Residual             0.6066   0.7788  
+Number of obs: 4432, groups:  id, 554; animal, 8
+
+Fixed effects:
+               Estimate Std. Error         df t value             Pr(>|t|)    
+(Intercept)    3.379363   0.236867  63.978989  14.267 < 0.0000000000000002 ***
+genderMale     0.013775   0.067778 545.995709   0.203              0.83903    
+age            0.004688   0.002183 545.995696   2.147              0.03221 *  
+conservative  -0.029375   0.012988 545.995705  -2.262              0.02410 *  
+education     -0.020273   0.030362 545.995703  -0.668              0.50460    
+religious      0.252734   0.074878 545.995711   3.375              0.00079 ***
+vegn           0.101074   0.141795 545.995710   0.713              0.47626    
+pet            0.146348   0.155272 545.995708   0.943              0.34634    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) gndrMl age    cnsrvt eductn religs vegn  
+genderMale  -0.163                                          
+age         -0.287  0.065                                   
+conservativ -0.205 -0.062 -0.057                            
+education   -0.278 -0.030 -0.188  0.120                     
+religious   -0.054  0.079  0.030 -0.432 -0.069              
+vegn         0.008 -0.007 -0.034  0.068 -0.099 -0.011       
+pet         -0.574  0.017 -0.107 -0.070  0.031  0.042 -0.028

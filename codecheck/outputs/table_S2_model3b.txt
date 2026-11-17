@@ -1,0 +1,46 @@
+Generalized linear mixed model fit by maximum likelihood (Laplace
+  Approximation) [glmerMod]
+ Family: binomial  ( logit )
+Formula: emotion_bin ~ gender + age + conservative + education + religious +  
+    vegn + pet + (1 | animal) + (1 | id)
+   Data: filter(data_long, sample == "Laypeople")
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+   3527.4    3591.4   -1753.7    3507.4      4422 
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-21.3583  -0.3239  -0.1021   0.2731  18.7869 
+
+Random effects:
+ Groups Name        Variance Std.Dev.
+ id     (Intercept) 7.002    2.646   
+ animal (Intercept) 6.595    2.568   
+Number of obs: 4432, groups:  id, 554; animal, 8
+
+Fixed effects:
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  -0.172816   1.155431  -0.150 0.881105    
+genderMale   -0.441626   0.248439  -1.778 0.075469 .  
+age          -0.006697   0.008008  -0.836 0.403029    
+conservative -0.128305   0.047726  -2.688 0.007181 ** 
+education     0.081754   0.111373   0.734 0.462915    
+religious     0.175850   0.274440   0.641 0.521680    
+vegn          1.820132   0.519342   3.505 0.000457 ***
+pet           0.140320   0.568648   0.247 0.805093    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) gndrMl age    cnsrvt eductn religs vegn  
+genderMale  -0.116                                          
+age         -0.214  0.055                                   
+conservativ -0.152 -0.058 -0.061                            
+education   -0.210 -0.033 -0.186  0.120                     
+religious   -0.039  0.079  0.028 -0.432 -0.070              
+vegn         0.006 -0.006 -0.033  0.060 -0.099 -0.012       
+pet         -0.431  0.013 -0.107 -0.070  0.034  0.042 -0.027
+optimizer (Nelder_Mead) convergence code: 0 (OK)
+Model failed to converge with max|grad| = 0.00301612 (tol = 0.002, component 1)
+  See ?lme4::convergence and ?lme4::troubleshooting.
+

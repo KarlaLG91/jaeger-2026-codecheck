@@ -1,0 +1,42 @@
+Generalized linear mixed model fit by maximum likelihood (Laplace
+  Approximation) [glmerMod]
+ Family: binomial  ( logit )
+Formula: conscious_bin ~ gender + age + conservative + education + religious +  
+    vegn + pet + (1 | animal) + (1 | id)
+   Data: filter(data_long, sample == "Laypeople")
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+   3532.8    3596.7   -1756.4    3512.8      4422 
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-31.2182  -0.2677  -0.0541   0.2257   6.5667 
+
+Random effects:
+ Groups Name        Variance Std.Dev.
+ id     (Intercept) 12.49    3.534   
+ animal (Intercept)  5.66    2.379   
+Number of obs: 4432, groups:  id, 554; animal, 8
+
+Fixed effects:
+              Estimate Std. Error z value Pr(>|z|)  
+(Intercept)  -0.832535   1.252673  -0.665   0.5063  
+genderMale   -0.609660   0.324061  -1.881   0.0599 .
+age          -0.006425   0.010459  -0.614   0.5390  
+conservative -0.057752   0.062055  -0.931   0.3520  
+education     0.083697   0.145125   0.577   0.5641  
+religious     0.221122   0.358345   0.617   0.5372  
+vegn          1.688991   0.675672   2.500   0.0124 *
+pet           0.627850   0.738664   0.850   0.3953  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) gndrMl age    cnsrvt eductn religs vegn  
+genderMale  -0.144                                          
+age         -0.259  0.061                                   
+conservativ -0.182 -0.056 -0.054                            
+education   -0.248 -0.031 -0.189  0.115                     
+religious   -0.049  0.075  0.026 -0.435 -0.067              
+vegn         0.007 -0.007 -0.036  0.070 -0.101 -0.019       
+pet         -0.514  0.015 -0.108 -0.074  0.028  0.046 -0.026

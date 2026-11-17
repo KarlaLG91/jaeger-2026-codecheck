@@ -1,0 +1,245 @@
+---
+format:
+  pdf:
+    toc: false
+    include-in-header:
+      - ../codecheck-preamble.sty
+      - text: |
+          %% Code and its output at 7pt, to fit about 120 characters on a line
+          \newcommand{\codesize}{\fontsize{7pt}{8.5pt}\selectfont}
+          \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},fontsize=\codesize}
+          \makeatletter\renewcommand{\verbatim@font}{\ttfamily\codesize}\makeatother
+    pdf-engine: xelatex
+engine: knitr
+---
+
+```{r rsetup,eval=TRUE,include=FALSE}
+require("codecheck")
+require("knitr")
+require("rprojroot")
+require("yaml")
+require("xtable")
+require("tibble")
+require("readr")
+options(width = 120)  # matches the 7pt code font set in the header
+opts_chunk$set(cache = FALSE)
+
+root <- find_root("codecheck.yml")
+```
+
+```{r check_sibling_template, eval=TRUE, include=FALSE}
+## Warn if codecheck.Rmd is also present next to this file - having both
+## makes it unclear which one is the canonical certificate source.
+if (file.exists(file.path(root, "codecheck", "codecheck.Rmd"))) {
+  warning("Both codecheck.Rmd and codecheck.qmd are present in codecheck/ - ",
+          "remove one so the certificate source is unambiguous.")
+}
+```
+
+```{r validate_yaml_syntax, eval=TRUE, include=FALSE}
+## Validate YAML syntax - will stop rendering if YAML is invalid
+codecheck::validate_yaml_syntax(file.path(root, "codecheck.yml"))
+```
+
+```{r check_certificate_id, eval=TRUE, include=FALSE}
+## Check if certificate identifier is set properly and try to update from GitHub
+## This will check if the certificate is a placeholder and attempt to retrieve
+## the actual certificate ID from GitHub issues matching the author names
+
+# Check if certificate is a placeholder
+yml_path <- file.path(root, "codecheck.yml")
+if (codecheck::is_placeholder_certificate(yml_path)) {
+  message("CERTIFICATE ID NOT SET")
+
+  # Try to automatically retrieve and update certificate from GitHub
+  result <- codecheck::update_certificate_from_github(
+    yml_file = yml_path,
+    issue_state = "open",
+    apply_update = FALSE  # Set to TRUE to automatically update
+  )
+
+  if (!is.null(result$certificate) && result$certificate != "") {
+    message("\n✓ Certificate found! To apply the update, run:")
+    message("\n  codecheck::update_certificate_from_github(apply_update = TRUE)")
+    message("\nOr manually update codecheck.yml with certificate: ", result$certificate)
+  } else {
+    message("\nℹ No matching certificate found in GitHub issues.")
+    message("You may need to manually set the certificate identifier in codecheck.yml")
+  }
+}
+```
+
+```{r manifest, eval=TRUE, include=FALSE}
+metadata <- codecheck::codecheck_metadata(root)
+manifest <- metadata$manifest
+
+dest_dir <- file.path(root, "codecheck", "outputs")
+## Create the outputs directory if missing
+if (!dir.exists(dest_dir) ) {
+  dir.create(dest_dir, recursive = TRUE)
+}
+
+manifest_df <- codecheck::list_manifest_files(root, metadata, dest_dir)
+```
+
+```{r validate_crossref, eval=TRUE, include=FALSE}
+## Validate metadata against CrossRef and ORCID metadata - will fail rendering on mismatch
+## Set strict = FALSE or remove this chunk if you want to skip validation
+##
+## ORCID name checks first try the authenticated ORCID API, then automatically
+## fall back to the public, unauthenticated ORCID API for records whose name
+## is publicly visible - so most checks work without any ORCID setup at all.
+## skip_on_auth_error only matters if BOTH lookups fail for a record (e.g. no
+## network access, or the record's name is not public); it is enabled below
+## so a fresh workspace always renders even in that case.
+validation_result <- codecheck::validate_contents_references(
+  yml_file = file.path(root, "codecheck.yml"),
+  strict = TRUE
+  , skip_on_auth_error = TRUE
+)
+```
+
+```{r print_title, echo=FALSE, results='asis'}
+## The certificate title/subtitle depend on `metadata`, computed above from
+## codecheck.yml - unlike R Markdown, Quarto's knitr engine does not evaluate
+## inline `r` code inside a document's YAML metadata blocks, so the title
+## cannot be set dynamically via YAML here. It is instead emitted directly as
+## LaTeX, using the same \title/\subtitle/\maketitle commands pandoc's
+## title-block metadata would otherwise have produced.
+cat(sprintf("\\title{%s}\n", paste("CODECHECK certificate", metadata$certificate)))
+cat(sprintf("\\subtitle{%s}\n", codecheck:::as_latex_url(metadata$report)))
+cat("\\maketitle\n")
+```
+
+```{r codecheck_logo, echo=FALSE,results='asis'}
+codecheck::latex_codecheck_logo()
+```
+
+```{r validate_certificate, echo=FALSE, results='asis'}
+## Validate certificate and display warning if placeholder, or if the
+## report DOI is a Zenodo concept DOI instead of a version-specific DOI
+## Set strict = TRUE to fail rendering if certificate is a placeholder
+## Set display_warning = FALSE to suppress the warning box in PDF output
+codecheck::validate_certificate_for_rendering(
+  yml_file = file.path(root, "codecheck.yml"),
+  strict = FALSE,           # Set to TRUE to fail rendering
+  display_warning = TRUE    # Set to FALSE to hide warning in PDF
+)
+```
+
+```{r summary_metadata, echo=FALSE, results='asis'}
+codecheck::latex_summary_of_metadata(metadata)
+```
+
+```{r summary_manifest, echo=FALSE, results='asis'}
+codecheck::latex_summary_of_manifest(metadata, manifest_df, root)
+```
+
+\clearpage
+
+# CODECHECKER notes
+
+```{r git_sha, echo=FALSE}
+gitInfo <- codecheck::get_git_info(root)
+```
+
+`r gitInfo`
+
+The code and data used for this check are available in the
+[OSF record](https://osf.io/9v3rh/).
+
+The code (`analysis code.R`, written in R) and data (`data experts.csv`,
+`data laypeople.csv`) were run unmodified, with the working directory set to
+the folder containing the data. The script was run from the top up to and
+including the definition of `model4b` (line 813). The bootstrapped
+`confint()` calls were skipped, as they are not needed for Tables S1-S4. The
+reproduced output of `summary()` for each model was saved to a text file and
+compared with the corresponding table in `supplemental materials.pdf`.
+
+**Result: Tables S1-S4 were reproduced with small numerical differences.**
+The comparisons below show last-digit differences of up to 0.001 in some
+reported coefficients and in the Table S1 intercept p-value (.506 reproduced
+versus .507 published). Their cause has not been established; rounding or
+truncation may account for some differences. The comparisons shown do not
+change the statistical significance of the reported effects. This check
+covers these four tables, excluding the bootstrapped confidence intervals,
+rather than the complete analysis workflow.
+
+| Table | Reproduced by | Model | Outcome | Result |
+|-------|---------------|-------|---------|--------|
+| S1 | `summary(model3a)` | `glmer`, binomial | Consciousness attribution | Reproduced |
+| S2 | `summary(model3b)` | `glmer`, binomial | Emotion attribution | Reproduced (differences of up to 0.001) |
+| S3 | `summary(model4a)` | `lmer` | Confidence, consciousness | Reproduced |
+| S4 | `summary(model4b)` | `lmer` | Confidence, emotion | Reproduced |
+
+Evidence (reproduced estimate / SE / p vs. published b / SE / p):
+
+| Table | Predictor | Reproduced | Published |
+|-------|-----------|------------|-----------|
+| S1 | Intercept | -0.833 / 1.253 / .506 | -0.832 / 1.253 / .507 |
+| S1 | Veg*n diet | 1.689 / 0.676 / .012 | 1.689 / 0.676 / .012 |
+| S2 | Conservative | -0.128 / 0.048 / .007 | -0.128 / 0.048 / .007 |
+| S2 | Veg*n diet | 1.820 / 0.519 / < .001 | 1.819 / 0.519 / < .001 |
+| S3 | Intercept | 3.400 / 0.237 / < .001 | 3.400 / 0.237 / < .001 |
+| S3 | Religiosity | 0.131 / 0.082 / .109 | 0.131 / 0.082 / .109 |
+| S4 | Age | 0.005 / 0.002 / .032 | 0.004 / 0.002 / .032 |
+| S4 | Conservative | -0.029 / 0.013 / .024 | -0.029 / 0.013 / .024 |
+| S4 | Religiosity | 0.253 / 0.075 / < .001 | 0.253 / 0.075 / < .001 |
+
+The full `summary()` output of each model is included in the manifest files
+below (`table_S1_model3a.txt` to `table_S4_model4b.txt`).
+
+R printed a convergence warning (max|grad| = 0.003, tolerance 0.002) while
+running the script; the reproduced estimates still match the published values.
+The script runs in about 20 seconds on my laptop (excluding the bootstrapped
+confidence intervals).
+
+## Recommendations
+
+I suggest to the authors to consider the following suggestions for their next publication or workflow:
+
+- Add a `README` listing the required R packages (and versions) and stating that the script must be run from the folder containing the data.
+- Replace the spaces in file names (`analysis code.R`, `data experts.csv`) to make them easier to use from the command line.
+- Label each `summary()` call in the script with the table it produces (e.g. `# Table S1`).
+- The line `ci <- cbind(exp(fixef(...), exp(confint.merMod(...))))` has a misplaced parenthesis, so the odds ratios are not computed as intended; consider fixing it.
+
+\clearpage
+
+# Manifest files
+
+```{r manifest_files, echo=FALSE, results="asis", width=100}
+codecheck::render_manifest_files(manifest_df, metadata = metadata)
+```
+
+\clearpage
+
+# Citing this document
+
+```{r, results='asis',echo=FALSE}
+codecheck::cite_certificate(metadata)
+```
+
+# About CODECHECK
+
+This certificate confirms that the codechecker could independently
+reproduce the results of a computational analysis given the data and
+code from a third party.  A CODECHECK does not check whether the
+original computation analysis is correct.  However, as all materials
+required for the reproduction are freely available by following the
+links in this document, the reader can then study for themselves the
+code and data.
+
+# About this document
+
+This document was created using [Quarto](https://quarto.org/) using the
+[`codecheck`](https://github.com/codecheckers/codecheck) R package. See the
+[Quarto PDF basics](https://quarto.org/docs/output-formats/pdf-basics.html)
+and [PDF engine](https://quarto.org/docs/output-formats/pdf-engine.html)
+documentation for background on the PDF output produced here (via tinytex).
+From the `codecheck/` directory, run `quarto render codecheck.qmd --to pdf`
+to regenerate the report file.
+
+```{r}
+sessionInfo()
+```
+
